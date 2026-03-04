@@ -639,7 +639,7 @@ const POR_PAG   = 20;
 // CONFIGURACIÓN — pega aquí la URL de tu Web App de Apps Script
 // Menú: Implementar → Nueva implementación → Web App → Copiar URL
 // ══════════════════════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJl0GA9t-065eNEfUFlBv42gbKMJf_DIRrmJn6exer57zIB9KnUBBaMBpZSEKDLOT0LQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzP5IW52jxTcMVsmYbvo8ImasV60yHvI4V3gKp-t-Jd9bP8cGH6CFS5cdsS-pYc579f2A/exec';
 
 // ── Utils ─────────────────────────────────────────────────────
 const $  = id => document.getElementById(id);
@@ -875,10 +875,10 @@ function renderCardTable(containerId, title, data, summaryKeys, expandKeys, canE
             let adj=[];
             try{ adj=v?JSON.parse(v):[]; }catch(e){}
             if(!adj.length) return `<td><span style="color:#cbd5e1;font-size:11px;">—</span></td>`;
-            const links=adj.map((a,i)=>`<a href="${esc(a.url)}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:600;color:#1a4b8c;background:#f0f4ff;border:1px solid #c7d7f9;border-radius:4px;padding:2px 6px;text-decoration:none;white-space:nowrap;" title="${esc(a.nombre)}">📎 ${i+1}</a>`).join(' ');
+            const links=adj.map((a,i)=>`<a href="${esc(drivePublicUrl(a.url))}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:600;color:#1a4b8c;background:#f0f4ff;border:1px solid #c7d7f9;border-radius:4px;padding:2px 6px;text-decoration:none;white-space:nowrap;" title="${esc(a.nombre)}">📎 ${i+1}</a>`).join(' ');
             return `<td style="white-space:nowrap;">${links}</td>`;
           }
-          if(/url/.test(k)&&v) return `<td><a class="link-doc" href="${esc(v)}" target="_blank" onclick="event.stopPropagation()">🔗 Ver</a></td>`;
+          if(/url/.test(k)&&v) return `<td><a class="link-doc" href="${esc(drivePublicUrl(v))}" target="_blank" onclick="event.stopPropagation()">🔗 Ver</a></td>`;
           return `<td title="${esc(v)}">${esc(v)}</td>`;
         }).join('');
         cells+=`<td class="td-actions">
@@ -906,11 +906,11 @@ function renderCardTable(containerId, title, data, summaryKeys, expandKeys, canE
             let adj=[];
             try{ adj=v?JSON.parse(v):[]; }catch(e){}
             const linksHtml = adj.length
-              ? adj.map((a,i)=>`<a class="link-doc" href="${esc(a.url)}" target="_blank" title="${esc(a.nombre)}">📎 Adjunto ${i+1} — ${esc(a.nombre)}</a>`).join('<br>')
+              ? adj.map((a,i)=>`<a class="link-doc" href="${esc(drivePublicUrl(a.url))}" target="_blank" title="${esc(a.nombre)}">📎 Adjunto ${i+1} — ${esc(a.nombre)}</a>`).join('<br>')
               : '<span class="empty-val">Sin adjuntos</span>';
             f.innerHTML=`<label>Adjuntos</label><span>${linksHtml}</span>`;
           } else if(/url/.test(k)&&v){
-            f.innerHTML=`<label>${k.replace(/_/g,' ')}</label><span><a class="link-doc" href="${esc(v)}" target="_blank">🔗 Abrir enlace</a></span>`;
+            f.innerHTML=`<label>${k.replace(/_/g,' ')}</label><span><a class="link-doc" href="${esc(drivePublicUrl(v))}" target="_blank">🔗 Abrir enlace</a></span>`;
           } else if(/estado|revision|aprobad|revisad/.test(k)){
             f.innerHTML=`<label>${k.replace(/_/g,' ')}</label><span>${badgeHtml(v)}</span>`;
           } else {
@@ -1604,7 +1604,7 @@ function uploadFieldHtml(fieldName, fieldId, label, currentVal, onChangeCallback
           <span class="pill-icon">📄</span>
           <span class="pill-name" id="${fieldId}_name">${esc(nombre)}</span>
           <div class="pill-actions">
-            <a class="btn-pill-open" id="${fieldId}_openBtn" href="${esc(currentVal||'#')}" target="_blank">🔗 Abrir</a>
+            <a class="btn-pill-open" id="${fieldId}_openBtn" href="${esc(drivePublicUrl(currentVal)||'#')}" target="_blank">🔗 Abrir</a>
             <button type="button" class="btn-pill-del" onclick="clearUploadField('${fieldId}'${onChangeCallback?`,'${onChangeCallback}'`:''})">✕ Eliminar</button>
           </div>
         </div>
@@ -1667,7 +1667,7 @@ async function handleFileUpload(fieldId){
       document.getElementById(fieldId + '_pill').classList.add('show');
       document.getElementById(fieldId + '_empty').style.display = 'none';
       document.getElementById(fieldId + '_name').textContent    = result.nombre;
-      document.getElementById(fieldId + '_openBtn').href        = result.url;
+      document.getElementById(fieldId + '_openBtn').href        = drivePublicUrl(result.url);
       showStatus(statusEl, '', ''); // limpiar
       statusEl.style.display = 'none';
       // Actualizar preview estado
@@ -1692,6 +1692,19 @@ function showStatus(el, type, msg){
     ? `<div class="upload-spinner"></div><span>${msg}</span>`
     : `<span>${msg}</span>`;
   if(type === 'error') setTimeout(()=>{ el.className='upload-status'; el.innerHTML=''; }, 5000);
+}
+
+// Convierte cualquier URL de Google Drive a formato público de visualización.
+// Funciona con URLs antiguas (getUrl()) y nuevas (view).
+function drivePublicUrl(url) {
+  if (!url) return url;
+  // Extraer el ID del archivo de cualquier formato de URL de Drive
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
+  if (m) return 'https://drive.google.com/file/d/' + m[1] + '/view?usp=sharing';
+  // Si tiene id= como parámetro (uc?id=...)
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+  if (m2) return 'https://drive.google.com/file/d/' + m2[1] + '/view?usp=sharing';
+  return url; // si no es Drive, devolver tal cual
 }
 
 function fileToBase64(file){
@@ -1800,7 +1813,7 @@ function adjuntosFieldHtml(adjuntosActuales) {
   const items   = (adjuntosActuales || []).map((a, i) => `
     <div class="adjunto-item" id="adj_item_${i}">
       <span class="adjunto-icon">${iconoAdjunto(a.nombre)}</span>
-      <span class="adjunto-nombre"><a href="${esc(a.url)}" target="_blank">${esc(a.nombre)}</a></span>
+      <span class="adjunto-nombre"><a href="${esc(drivePublicUrl(a.url))}" target="_blank">${esc(a.nombre)}</a></span>
       ${esAdmin ? `<button type="button" class="btn-adj-del" onclick="eliminarAdjuntoUI(${i},'${esc(a.id)}')">✕</button>` : ''}
     </div>`).join('');
 
@@ -1865,7 +1878,7 @@ async function handleAdjuntosUpload() {
         item.id        = `adj_item_${idx}`;
         item.innerHTML = `
           <span class="adjunto-icon">${iconoAdjunto(result.nombre)}</span>
-          <span class="adjunto-nombre"><a href="${esc(result.url)}" target="_blank">${esc(result.nombre)}</a></span>
+          <span class="adjunto-nombre"><a href="${esc(drivePublicUrl(result.url))}" target="_blank">${esc(result.nombre)}</a></span>
           ${esAdmin ? `<button type="button" class="btn-adj-del" onclick="eliminarAdjuntoUI(${idx},'${esc(result.id)}')">✕</button>` : ''}`;
         lista.appendChild(item);
         showToast(`✅ "${result.nombre}" adjuntado`);
@@ -1891,7 +1904,7 @@ async function eliminarAdjuntoUI(idx, fileId) {
       lista.innerHTML = _adjuntos.map((a, i) => `
         <div class="adjunto-item" id="adj_item_${i}">
           <span class="adjunto-icon">${iconoAdjunto(a.nombre)}</span>
-          <span class="adjunto-nombre"><a href="${esc(a.url)}" target="_blank">${esc(a.nombre)}</a></span>
+          <span class="adjunto-nombre"><a href="${esc(drivePublicUrl(a.url))}" target="_blank">${esc(a.nombre)}</a></span>
           <button type="button" class="btn-adj-del" onclick="eliminarAdjuntoUI(${i},'${esc(a.id)}')">✕</button>
         </div>`).join('');
       showToast('Archivo eliminado');
