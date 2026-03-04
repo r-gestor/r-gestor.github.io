@@ -1,18 +1,1915 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Secretaría de Salud – Jamundí</title>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter','Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#1a2540;min-height:100vh;}
+
+    /* ══ LOGIN ══════════════════════════════════════════════ */
+    #loginScreen{
+      display:flex;align-items:center;justify-content:center;min-height:100vh;
+      background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      padding:20px;
+    }
+    .login-wrap{
+      background:#fff;border-radius:16px;
+      box-shadow:0 16px 48px rgba(0,0,0,.18);
+      max-width:420px;width:100%;overflow:hidden;
+    }
+    .login-header{
+      background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      padding:32px 40px 28px;text-align:center;color:#fff;
+    }
+    .login-header .mun{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;opacity:.75;margin-bottom:6px;}
+    .login-header h1{font-size:28px;font-weight:700;letter-spacing:1px;margin-bottom:4px;}
+    .login-header p{font-size:13px;opacity:.8;}
+    .login-body{padding:32px 36px 36px;}
+    .login-body .form-group{margin-bottom:18px;}
+    .login-body label{display:block;font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+    .login-body input{
+      width:100%;padding:11px 14px;font-size:15px;border:2px solid #e0e0e0;
+      border-radius:8px;outline:none;font-family:inherit;color:#333;transition:border-color .2s;
+    }
+    .login-body input:focus{border-color:#1a4b8c;box-shadow:0 0 0 3px rgba(26,75,140,.1);}
+    .btn-login{
+      width:100%;padding:13px;background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;
+      cursor:pointer;font-family:inherit;transition:opacity .2s,transform .2s;margin-top:4px;
+    }
+    .btn-login:hover{opacity:.92;transform:translateY(-1px);}
+    .login-err{
+      background:#fef2f2;color:#dc2626;border:1px solid #fecaca;
+      border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:14px;
+      text-align:center;display:none;
+    }
+
+    /* ══ APP SHELL ══════════════════════════════════════════ */
+    #appShell{display:none;min-height:100vh;}
+
+    /* Topbar */
+    .topbar{
+      background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      color:#fff;height:58px;padding:0 20px;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:200;
+      box-shadow:0 2px 12px rgba(0,0,0,.25);
+    }
+    .topbar-brand{display:flex;align-items:center;gap:10px;}
+    .topbar-brand .brand-icon{font-size:22px;}
+    .topbar-brand .brand-name{font-size:14px;font-weight:700;letter-spacing:.3px;}
+    .topbar-brand .brand-sub{font-size:11px;opacity:.7;display:block;}
+    .topbar-right{display:flex;align-items:center;gap:8px;}
+    .user-pill{
+      background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+      padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600;
+    }
+    .rol-pill{
+      padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:capitalize;
+    }
+    .rol-administrador{background:#f59e0b;color:#1a1a1a;}
+    .rol-revisor{background:#3b82f6;color:#fff;}
+    .rol-aprobador{background:#10b981;color:#fff;}
+    .rol-cargador{background:rgba(255,255,255,.25);color:#fff;}
+    .btn-logout{
+      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+      color:#fff;padding:5px 12px;border-radius:8px;cursor:pointer;
+      font-size:12px;font-family:inherit;font-weight:600;transition:background .2s;
+    }
+    .btn-logout:hover{background:rgba(255,255,255,.2);}
+    /* hamburger mobile */
+    .btn-menu{
+      display:none;background:none;border:none;color:#fff;cursor:pointer;
+      font-size:20px;padding:4px 8px;
+    }
+    @media(max-width:700px){.btn-menu{display:block;}.brand-sub{display:none!important;}}
+
+    /* Layout */
+    .app-body{display:flex;min-height:calc(100vh - 58px);}
+
+    /* Sidenav */
+    .sidenav{
+      width:220px;background:#fff;border-right:1px solid #e4eaf2;
+      padding:16px 0;position:fixed;top:58px;
+      height:calc(100vh - 58px);overflow-y:auto;
+      transition:transform .3s;z-index:150;
+    }
+    .sidenav.hidden{transform:translateX(-100%);}
+    .nav-section{
+      padding:5px 16px;font-size:10px;font-weight:700;color:#9aaccc;
+      text-transform:uppercase;letter-spacing:.1em;margin-top:10px;
+    }
+    .nav-item{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 18px;cursor:pointer;font-size:13px;color:#444;
+      transition:background .15s;border-left:3px solid transparent;
+      font-weight:500;
+    }
+    .nav-item:hover{background:#f5f8ff;}
+    .nav-item.active{background:#e8f0fe;border-left-color:#1a4b8c;color:#1a4b8c;font-weight:600;}
+    .nav-item .nav-icon{font-size:17px;width:22px;text-align:center;flex-shrink:0;}
+    .nav-badge{
+      margin-left:auto;background:#e8f0fe;color:#1a4b8c;
+      font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;
+    }
+
+    /* Main */
+    .main{margin-left:220px;padding:24px;flex:1;}
+    @media(max-width:700px){.main{margin-left:0;padding:14px;}.sidenav{transform:translateX(-100%);}.sidenav.open{transform:translateX(0);}}
+
+    /* Page header */
+    .page-hd{margin-bottom:20px;}
+    .page-hd h2{font-size:20px;font-weight:700;color:#1a2540;}
+    .page-hd p{font-size:13px;color:#9aaccc;margin-top:3px;}
+
+    /* Stats */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px;}
+    .stat-card{
+      background:#fff;border-radius:12px;padding:18px 20px;
+      border-left:4px solid #1a4b8c;
+      box-shadow:0 2px 8px rgba(0,0,0,.05);
+    }
+    .stat-card.green{border-left-color:#0d6e3e;}
+    .stat-card.amber{border-left-color:#f59e0b;}
+    .stat-card.rose{border-left-color:#ef4444;}
+    .stat-card.purple{border-left-color:#7c3aed;}
+    .stat-card.slate{border-left-color:#64748b;}
+    .stat-val{font-size:28px;font-weight:700;color:#1a2540;}
+    .stat-lbl{font-size:12px;color:#9aaccc;margin-top:2px;}
+
+    /* Dashboard estado tables */
+    .dash-section{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);overflow:hidden;margin-bottom:20px;}
+    .dash-section-hd{
+      padding:16px 22px;border-bottom:1px solid #f0f4f8;
+      display:flex;align-items:center;gap:10px;
+    }
+    .dash-section-hd h3{font-size:15px;font-weight:700;color:#1a2540;margin:0;}
+    .dash-section-hd span{font-size:12px;color:#9aaccc;}
+    .dash-estado-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0;}
+    .dash-estado-item{
+      padding:18px 22px;border-right:1px solid #f0f4f8;
+      display:flex;flex-direction:column;gap:4px;
+    }
+    .dash-estado-item:last-child{border-right:none;}
+    .dash-estado-num{font-size:32px;font-weight:800;color:#1a2540;line-height:1;}
+    .dash-estado-lbl{font-size:12px;color:#9aaccc;font-weight:500;}
+    .dash-estado-bar{height:3px;border-radius:2px;margin-top:6px;}
+
+    /* Table card */
+    .tbl-card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);overflow:hidden;}
+    .tbl-toolbar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 18px;border-bottom:1px solid #e4eaf2;flex-wrap:wrap;gap:10px;
+    }
+    .tbl-toolbar h3{font-size:14px;font-weight:700;color:#1a2540;}
+    .toolbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .search-box{
+      padding:8px 12px 8px 32px;border:2px solid #e4eaf2;border-radius:8px;
+      font-size:13px;font-family:inherit;outline:none;width:200px;transition:border-color .2s;
+      position:relative;
+    }
+    .search-box:focus{border-color:#1a4b8c;}
+    .search-wrap{position:relative;display:inline-block;}
+    .search-wrap::before{
+      content:"🔎";position:absolute;left:9px;top:50%;transform:translateY(-50%);
+      font-size:12px;pointer-events:none;
+    }
+    .btn-add{
+      display:flex;align-items:center;gap:5px;
+      background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      color:#fff;border:none;padding:8px 16px;border-radius:8px;
+      font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+      transition:opacity .2s,transform .2s;white-space:nowrap;
+    }
+    .btn-add:hover{opacity:.9;transform:translateY(-1px);}
+    .tbl-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    thead tr{background:#f8fafc;}
+    th{
+      padding:10px 14px;text-align:left;font-size:11px;font-weight:700;
+      color:#9aaccc;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;
+    }
+    td{
+      padding:11px 14px;border-top:1px solid #e4eaf2;
+      max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+      vertical-align:middle;
+    }
+    tr:hover td{background:#f8fafc;}
+    .td-actions{white-space:nowrap;width:80px;}
+    .btn-icon{
+      background:none;border:none;cursor:pointer;padding:4px 6px;
+      border-radius:6px;transition:background .15s;color:#9aaccc;font-size:15px;
+    }
+    .btn-icon:hover{background:#f0f4f8;}
+    .btn-icon.del:hover{background:#fef2f2;color:#dc2626;}
+
+    /* Expandable rows */
+    .pqrs-card-row{cursor:pointer;}
+    .pqrs-card-row:hover td{background:#f5f8ff;}
+    .pqrs-expand-row td{
+      padding:0!important;border-top:none!important;
+      background:#f8fafc;
+    }
+    .expand-inner{
+      max-height:0;overflow:hidden;
+      transition:max-height .35s cubic-bezier(.4,0,.2,1);
+    }
+    .pqrs-card-row.open + .pqrs-expand-row .expand-inner{max-height:400px;}
+    .expand-content{padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+    .expand-field label{font-size:10px;font-weight:700;color:#9aaccc;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px;}
+    .expand-field span{font-size:13px;color:#1a2540;word-break:break-word;line-height:1.5;}
+    .expand-field span.empty-val{color:#c0c8d8;font-style:italic;}
+    .expand-field.full{grid-column:1/-1;}
+    .chevron{display:inline-block;transition:transform .3s;font-style:normal;font-size:11px;margin-left:4px;}
+    .pqrs-card-row.open .chevron{transform:rotate(180deg);}
+
+    /* Badges */
+    .badge{
+      display:inline-block;padding:3px 10px;border-radius:20px;
+      font-size:11px;font-weight:700;white-space:nowrap;
+    }
+    .b-pendiente{background:#fef3c7;color:#92400e;}
+    .b-revisado {background:#d1fae5;color:#065f46;}
+    .b-aprobado {background:#d1fae5;color:#065f46;}
+    .b-rechazado{background:#fee2e2;color:#991b1b;}
+    .b-activo   {background:#d1fae5;color:#065f46;}
+    .b-default  {background:#e5e7eb;color:#374151;}
+    .b-sin-oficio     {background:#dc2626;color:#fff;}
+    .b-sin-revision   {background:#f97316;color:#fff;}
+    .b-sin-aprobacion {background:#f59e0b;color:#1a1a1a;}
+    .b-sin-sisnet     {background:#7c3aed;color:#fff;}
+    .b-para-imprimir  {background:#16a34a;color:#fff;}
+    .b-enviado        {background:#0d6e3e;color:#fff;}
+    .link-doc{
+      display:inline-flex;align-items:center;gap:4px;color:#1a4b8c;
+      font-size:12px;font-weight:600;text-decoration:none;
+    }
+    .link-doc:hover{text-decoration:underline;}
+
+    /* Modal */
+    .modal-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(13,27,42,.55);z-index:500;
+      align-items:center;justify-content:center;padding:16px;
+    }
+    .modal-overlay.open{display:flex;}
+    .modal{
+      background:#fff;border-radius:16px;
+      width:680px;max-width:100%;max-height:90vh;
+      overflow-y:auto;box-shadow:0 40px 100px rgba(0,0,0,.35);
+    }
+    .modal-hd{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:18px 24px;border-bottom:1px solid #e4eaf2;
+      position:sticky;top:0;background:#fff;z-index:1;
+    }
+    .modal-hd h3{font-size:15px;font-weight:700;color:#1a2540;}
+    .btn-close{background:none;border:none;cursor:pointer;font-size:20px;color:#9aaccc;line-height:1;}
+    .modal-bd{padding:22px 24px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .form-grid .g-full{grid-column:1/-1;}
+    .field{display:flex;flex-direction:column;gap:5px;}
+    .field label{font-size:11px;font-weight:700;color:#9aaccc;text-transform:uppercase;letter-spacing:.06em;}
+    .field input,.field select,.field textarea{
+      padding:9px 12px;border:2px solid #e4eaf2;border-radius:8px;
+      font-size:13px;font-family:inherit;color:#1a2540;outline:none;transition:border-color .2s;
+    }
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:#1a4b8c;}
+    .field textarea{resize:vertical;min-height:75px;}
+    .modal-ft{
+      display:flex;justify-content:flex-end;gap:10px;
+      padding:14px 24px;border-top:1px solid #e4eaf2;
+    }
+    .btn-cancel{
+      padding:9px 20px;border:2px solid #e4eaf2;border-radius:8px;
+      background:#fff;font-family:inherit;cursor:pointer;font-size:13px;font-weight:600;color:#555;
+      transition:border-color .2s;
+    }
+    .btn-cancel:hover{border-color:#9aaccc;}
+    .btn-save{
+      padding:9px 24px;background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      color:#fff;border:none;border-radius:8px;
+      font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;
+      transition:opacity .2s,transform .2s;
+    }
+    .btn-save:hover{opacity:.92;transform:translateY(-1px);}
+
+    /* Toast */
+    .toast{
+      position:fixed;bottom:22px;right:22px;z-index:9999;
+      background:#1a2540;color:#fff;padding:12px 20px;
+      border-radius:10px;font-size:13px;font-weight:500;
+      box-shadow:0 8px 24px rgba(0,0,0,.3);
+      transform:translateY(80px);opacity:0;
+      transition:transform .3s,opacity .3s;
+      max-width:320px;
+    }
+    .toast.show{transform:translateY(0);opacity:1;}
+    .toast.ok{border-left:4px solid #10b981;}
+    .toast.err{border-left:4px solid #ef4444;}
+
+    /* Empty / loading */
+    .tbl-empty{text-align:center;padding:40px;color:#9aaccc;font-size:13px;}
+    .spinner{
+      border:3px solid #f0f0f0;border-top:3px solid #1a4b8c;
+      border-radius:50%;width:28px;height:28px;
+      animation:spin 1s linear infinite;margin:0 auto 12px;
+    }
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* Confirm dialog */
+    .confirm-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(13,27,42,.55);z-index:600;
+      align-items:center;justify-content:center;
+    }
+    .confirm-overlay.open{display:flex;}
+    .confirm-box{
+      background:#fff;border-radius:14px;padding:28px 28px 22px;
+      width:340px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.3);
+    }
+    .confirm-box h4{font-size:15px;font-weight:700;margin-bottom:8px;}
+    .confirm-box p{font-size:13px;color:#555;margin-bottom:22px;line-height:1.6;}
+    .confirm-btns{display:flex;justify-content:flex-end;gap:10px;}
+    .btn-conf-ok{
+      padding:9px 20px;background:#ef4444;color:#fff;border:none;
+      border-radius:8px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;
+    }
+    .btn-conf-cancel{
+      padding:9px 18px;border:2px solid #e4eaf2;background:#fff;
+      border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:#555;
+    }
+
+    /* Filtros */
+    .filtros-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+    .filtro-select{
+      padding:8px 10px;font-size:12px;border:2px solid #e4eaf2;
+      border-radius:8px;outline:none;background:#fff;color:#333;
+      cursor:pointer;font-family:inherit;transition:border-color .2s;
+    }
+    .filtro-select:focus{border-color:#1a4b8c;}
+
+    /* Paginación */
+    .paginacion{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #e4eaf2;flex-wrap:wrap;gap:8px;}
+    .pag-info{font-size:12px;color:#9aaccc;}
+    .pag-btns{display:flex;gap:4px;flex-wrap:wrap;}
+    .pag-btn{
+      padding:5px 11px;border:2px solid #e4eaf2;background:#fff;
+      border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:#555;transition:all .2s;
+    }
+    .pag-btn:hover:not(:disabled){border-color:#1a4b8c;color:#1a4b8c;}
+    .pag-btn.active{background:#1a4b8c;border-color:#1a4b8c;color:#fff;}
+    .pag-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+    /* ── URL Editable — solo botón abrir (sin eliminar) ── */
+    .url-editable-wrap{display:flex;flex-direction:column;gap:6px;}
+    .url-editable-btn{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;
+      font-family:inherit;cursor:pointer;border:none;transition:all .2s;width:100%;
+      justify-content:flex-start;
+    }
+    .url-editable-btn.sin-oficio{
+      background:#f1f5f9;border:2px dashed #cbd5e1;color:#94a3b8;cursor:default;
+    }
+    .url-editable-btn.con-oficio{
+      background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      color:#fff;box-shadow:0 2px 8px rgba(26,75,140,.25);
+    }
+    .url-editable-btn.con-oficio:hover{opacity:.88;transform:translateY(-1px);}
+    .url-editable-icon{font-size:16px;flex-shrink:0;}
+
+    /* ── Botón Generar Oficio ── */
+    .btn-generar{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:11px 18px;border:none;border-radius:8px;
+      font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;
+      transition:all .25s;
+    }
+    .btn-generar.disabled{
+      background:#e2e8f0;color:#94a3b8;cursor:not-allowed;
+      box-shadow:none;
+    }
+    .btn-generar.enabled{
+      background:linear-gradient(135deg,#7c3aed 0%,#2563eb 50%,#1e3a8a 100%);
+      color:#fff;
+      box-shadow:0 4px 15px rgba(124,58,237,.4);
+      animation:stellarPulse 3s ease-in-out infinite;
+    }
+    .btn-generar.enabled:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.5);}
+    .btn-generar.loading{
+      background:linear-gradient(135deg,#7c3aed 0%,#2563eb 50%,#1e3a8a 100%);
+      color:#fff;cursor:not-allowed;opacity:.75;
+    }
+    @keyframes stellarPulse{
+      0%,100%{box-shadow:0 4px 15px rgba(124,58,237,.4);}
+      50%{box-shadow:0 4px 25px rgba(37,99,235,.7),0 0 40px rgba(124,58,237,.3);}
+    }
+    .generar-spinner{
+      width:14px;height:14px;border:2px solid rgba(255,255,255,.4);
+      border-top-color:#fff;border-radius:50%;
+      animation:spin .8s linear infinite;flex-shrink:0;
+    }
+
+    /* ── Upload widget ── */
+    .upload-wrap{display:flex;flex-direction:column;gap:6px;}
+
+    /* ── Botón Enviar a responsable ── */
+    .responsable-wrap{display:flex;gap:8px;align-items:flex-end;}
+    .responsable-wrap .field{flex:1;margin:0;}
+    .btn-enviar-resp{
+      display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+      padding:9px 14px;border:none;border-radius:8px;
+      font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;
+      transition:all .2s;flex-shrink:0;align-self:flex-end;margin-bottom:0;
+    }
+    .btn-enviar-resp.disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed;}
+    .btn-enviar-resp.enabled{
+      background:linear-gradient(135deg,#0369a1 0%,#0d6e3e 100%);
+      color:#fff;box-shadow:0 2px 8px rgba(3,105,161,.3);
+    }
+    .btn-enviar-resp.enabled:hover{opacity:.88;transform:translateY(-1px);}
+    .btn-enviar-resp.loading{background:#e2e8f0;color:#64748b;cursor:not-allowed;}
+    .btn-ver-correo{
+      display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+      padding:9px 14px;background:#f0fdf4;border:1.5px solid #86efac;
+      color:#15803d;border-radius:8px;font-size:12px;font-weight:700;
+      font-family:inherit;cursor:pointer;text-decoration:none;
+      transition:all .2s;flex-shrink:0;align-self:flex-end;
+    }
+    .btn-ver-correo:hover{background:#dcfce7;}
+    .adjuntos-wrap{display:flex;flex-direction:column;gap:8px;}
+    .adjuntos-dropzone{
+      border:2px dashed #d1dae6;border-radius:8px;padding:14px 16px;
+      display:flex;align-items:center;gap:10px;cursor:pointer;
+      transition:border-color .2s,background .2s;
+    }
+    .adjuntos-dropzone:hover{border-color:#1a4b8c;background:#f5f8ff;}
+    .adjuntos-dropzone-text{font-size:13px;color:#9aaccc;flex:1;}
+    .adjuntos-dropzone-text span{color:#1a4b8c;font-weight:600;}
+    .btn-adj-upload{
+      display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+      padding:7px 13px;background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;
+      cursor:pointer;font-family:inherit;transition:opacity .2s;flex-shrink:0;
+    }
+    .btn-adj-upload:hover{opacity:.88;}
+    .adjuntos-list{display:flex;flex-direction:column;gap:5px;}
+    .adjunto-item{
+      display:flex;align-items:center;gap:8px;
+      background:#f8fafc;border:1px solid #e4eaf2;border-radius:7px;
+      padding:8px 12px;
+    }
+    .adjunto-icon{font-size:18px;flex-shrink:0;}
+    .adjunto-nombre{
+      font-size:13px;font-weight:500;color:#1a2540;flex:1;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .adjunto-nombre a{color:#1a4b8c;text-decoration:none;}
+    .adjunto-nombre a:hover{text-decoration:underline;}
+    .btn-adj-del{
+      padding:4px 9px;background:#fee2e2;color:#dc2626;
+      border:1.5px solid #fca5a5;border-radius:6px;
+      font-size:11px;font-weight:700;cursor:pointer;
+      font-family:inherit;transition:background .2s;flex-shrink:0;
+    }
+    .btn-adj-del:hover{background:#fecaca;}
+    .adjunto-uploading{
+      display:flex;align-items:center;gap:8px;
+      font-size:12px;color:#1d4ed8;background:#eff6ff;
+      border:1px solid #bfdbfe;border-radius:7px;padding:8px 12px;
+    }
+    .upload-file-input{display:none;}
+
+    /* Estado: sin archivo — zona de drop/subida */
+    .upload-empty{
+      display:flex;align-items:center;gap:8px;
+      border:2px dashed #d1dae6;border-radius:8px;padding:10px 14px;
+      cursor:pointer;transition:border-color .2s,background .2s;
+    }
+    .upload-empty:hover{border-color:#1a4b8c;background:#f5f8ff;}
+    .upload-empty .ue-icon{font-size:18px;flex-shrink:0;}
+    .upload-empty .ue-text{font-size:13px;color:#9aaccc;flex:1;}
+    .upload-empty .btn-upload{
+      display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+      padding:7px 13px;background:linear-gradient(135deg,#1a4b8c 0%,#0d6e3e 100%);
+      color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;
+      cursor:pointer;font-family:inherit;transition:opacity .2s;flex-shrink:0;
+    }
+    .upload-empty .btn-upload:hover{opacity:.88;}
+    .upload-empty .btn-upload:disabled{opacity:.5;cursor:not-allowed;}
+
+    /* Estado: con archivo — pill */
+    .upload-pill{
+      display:none;align-items:center;gap:8px;
+      background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:9px 12px;
+    }
+    .upload-pill.show{display:flex;}
+    .upload-pill .pill-icon{font-size:20px;flex-shrink:0;}
+    .upload-pill .pill-name{
+      font-size:13px;font-weight:600;color:#15803d;
+      flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .pill-actions{display:flex;gap:5px;flex-shrink:0;}
+    .btn-pill-open{
+      display:inline-flex;align-items:center;gap:4px;
+      padding:5px 11px;background:#15803d;color:#fff;border:none;
+      border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;
+      font-family:inherit;transition:opacity .2s;text-decoration:none;
+    }
+    .btn-pill-open:hover{opacity:.85;}
+    .btn-pill-del{
+      padding:5px 9px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;
+      border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;
+      font-family:inherit;transition:background .2s;
+    }
+    .btn-pill-del:hover{background:#fecaca;}
+
+    /* Estado: subiendo */
+    .upload-status{
+      display:none;align-items:center;gap:7px;
+      font-size:12px;padding:6px 10px;border-radius:6px;
+    }
+    .upload-status.uploading{display:flex;background:#eff6ff;color:#1d4ed8;}
+    .upload-status.error    {display:flex;background:#fef2f2;color:#dc2626;}
+    .upload-spinner{
+      width:14px;height:14px;border:2px solid #bfdbfe;border-top-color:#1d4ed8;
+      border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;
+    }
+    /* hidden url store */
+    .url-store{display:none;}
+  </style>
 </head>
 <body>
-  <script>
-fetch("https://script.google.com/a/macros/jamundi.gov.co/s/AKfycbxJQjtEFZbXZN28_wkBGru9rlKR9RiGrGGXA3nSzeFG1NP7VYWmXjcUajlT8tO7FC4Fbg/exec")
-  .then(res => res.json())
-  .then(data => {
-    console.log(data);
+
+<!-- ══ LOGIN ════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-header">
+      <p class="mun">Alcaldía Municipal de</p>
+      <h1>JAMUNDÍ</h1>
+      <p>Secretaría de Salud · Sistema de Actos Administrativos</p>
+    </div>
+    <div class="login-body">
+      <div class="login-err" id="loginErr"></div>
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="loginUser" placeholder="Ingrese su usuario"/>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="loginPass" placeholder="Ingrese su contraseña"
+               onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Ingresar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══════════════════════════════════════════════════ -->
+<div id="appShell">
+
+  <div class="topbar">
+    <div class="topbar-brand">
+      <button class="btn-menu" onclick="toggleSidenav()">☰</button>
+      <span class="brand-icon">🏥</span>
+      <div>
+        <span class="brand-name">Actos Administrativos</span>
+        <small class="brand-sub">Secretaría de Salud – Jamundí</small>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="user-pill" id="topUser"></span>
+      <span class="rol-pill" id="topRol"></span>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <nav class="sidenav" id="sidenav"></nav>
+    <main class="main" id="mainContent">
+      <div class="tbl-empty"><div class="spinner"></div>Cargando…</div>
+    </main>
+  </div>
+</div>
+
+<!-- ══ MODAL ════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="modalTitle">Formulario</h3>
+      <button class="btn-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-bd" id="modalBody"></div>
+    <div class="modal-ft">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-generar disabled" id="btnGenerarOficio" onclick="handleGenerarOficio()" disabled>✦ Generar oficio</button>
+      <button class="btn-save" onclick="submitModal()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM ══════════════════════════════════════════════ -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>¿Eliminar registro?</h4>
+    <p>Esta acción no se puede deshacer. El registro se eliminará permanentemente de la hoja de cálculo.</p>
+    <div class="confirm-btns">
+      <button class="btn-conf-cancel" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn-conf-ok" id="confirmOkBtn">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ════════════════════════════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let session     = null;
+let modalSaveCb = null;
+const POR_PAG   = 20;
+
+// ══════════════════════════════════════════════════════════════
+// CONFIGURACIÓN — pega aquí la URL de tu Web App de Apps Script
+// Menú: Implementar → Nueva implementación → Web App → Copiar URL
+// ══════════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJl0GA9t-065eNEfUFlBv42gbKMJf_DIRrmJn6exer57zIB9KnUBBaMBpZSEKDLOT0LQ/exec';
+
+// ── Utils ─────────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+const esc = t  => { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; };
+
+function showToast(msg, type='ok'){
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+async function call(fn, ...args){
+  const resp = await fetch(APPS_SCRIPT_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body:    JSON.stringify({ fn, args }),
+    redirect: 'follow'
   });
+  const json = await resp.json();
+  if (json.error) throw new Error(json.error);
+  return json.result;
+}
+
+function badgeHtml(val){
+  if(!val) return '<span class="badge b-default">—</span>';
+  const v = val.toLowerCase().trim();
+  let cls = 'b-default';
+  if(v==='sin oficio')                         cls='b-sin-oficio';
+  else if(v==='sin revision')                  cls='b-sin-revision';
+  else if(v==='sin aprobación'||v==='sin aprobacion') cls='b-sin-aprobacion';
+  else if(v==='sin sisnet')                    cls='b-sin-sisnet';
+  else if(v==='para imprimir')                 cls='b-para-imprimir';
+  else if(v==='enviado')                       cls='b-enviado';
+  else if(/aprobad/.test(v))                   cls='b-aprobado';
+  else if(/revisad/.test(v))                   cls='b-revisado';
+  else if(/rechazad/.test(v))                  cls='b-rechazado';
+  else if(/activo|vigente/.test(v))            cls='b-activo';
+  else if(/pendiente/.test(v))                 cls='b-pendiente';
+  return `<span class="badge ${cls}">${esc(val)}</span>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════════════
+async function doLogin(){
+  const u = $('loginUser').value.trim();
+  const p = $('loginPass').value.trim();
+  if(!u||!p) return;
+  try{
+    const r = await call('login', u, p);
+    if(r.ok){
+      session = r;
+      $('loginScreen').style.display='none';
+      $('appShell').style.display='block';
+      $('topUser').textContent = r.usuario;
+      $('topRol').textContent  = r.rol;
+      $('topRol').className    = `rol-pill rol-${r.rol}`;
+      buildNav();
+      navigate('dashboard');
+    } else {
+      const e = $('loginErr');
+      e.textContent = r.message;
+      e.style.display='block';
+    }
+  } catch(e){ showToast('Error de conexión','err'); }
+}
+
+function logout(){
+  session = null;
+  $('appShell').style.display='none';
+  $('loginScreen').style.display='flex';
+  $('loginPass').value='';
+  $('loginErr').style.display='none';
+}
+
+// ══════════════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════════════
+const PAGES = [
+  {id:'dashboard',  label:'Dashboard',   icon:'📊', roles:['administrador','revisor','aprobador','cargador']},
+  {id:'peticiones', label:'Peticiones',  icon:'📋', roles:['administrador','revisor','aprobador','cargador']},
+  {id:'deoficio',   label:'De Oficio',   icon:'📄', roles:['administrador','revisor','aprobador','cargador']},
+  {id:'actas',      label:'Actas',       icon:'📑', roles:['administrador','revisor','aprobador','cargador']},
+  {id:'usuarios',   label:'Usuarios',    icon:'👥', roles:['administrador']},
+];
+
+function buildNav(){
+  const nav = $('sidenav');
+  nav.innerHTML = '<div class="nav-section">Menú principal</div>';
+  PAGES.filter(p=>p.roles.includes(session.rol)).forEach(p=>{
+    const d = document.createElement('div');
+    d.className='nav-item'; d.id=`nav-${p.id}`;
+    d.innerHTML=`<span class="nav-icon">${p.icon}</span>${p.label}`;
+    d.onclick=()=>{ closeSidenavMobile(); navigate(p.id); };
+    nav.appendChild(d);
+  });
+}
+
+function navigate(page){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navEl=$(`nav-${page}`); if(navEl) navEl.classList.add('active');
+  const map={dashboard:renderDashboard, peticiones:renderPeticiones,
+             deoficio:renderDeOficio, actas:renderActas, usuarios:renderUsuarios};
+  if(map[page]) map[page]();
+}
+
+function toggleSidenav(){ $('sidenav').classList.toggle('open'); }
+function closeSidenavMobile(){ if(window.innerWidth<=700) $('sidenav').classList.remove('open'); }
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════════
+async function renderDashboard(){
+  $('mainContent').innerHTML='<div class="tbl-empty"><div class="spinner"></div>Cargando estadísticas…</div>';
+  const [pet, ofi, act] = await Promise.all([
+    call('getPeticionesFiltradas', session.nombre_completo || session.usuario, session.rol),
+    call('getDeOficioFiltrado',    session.nombre_completo || session.usuario, session.rol),
+    call('getConsecutivosActas')
+  ]);
+
+  const ESTADOS = [
+    { key:'Sin oficio',     color:'#dc2626', label:'Sin oficio'     },
+    { key:'Sin revision',   color:'#f97316', label:'Sin revisión'   },
+    { key:'Sin aprobación', color:'#f59e0b', label:'Sin aprobación' },
+    { key:'Sin sisnet',     color:'#7c3aed', label:'Sin sisnet'     },
+    { key:'Para imprimir',  color:'#16a34a', label:'Para imprimir'  },
+    { key:'Enviado',        color:'#0d6e3e', label:'Enviado'        },
+  ];
+
+  function contarEstados(datos) {
+    const mapa = {};
+    ESTADOS.forEach(e => { mapa[e.key] = 0; });
+    datos.forEach(r => {
+      const est = (r.estado || '').trim();
+      if (mapa.hasOwnProperty(est)) mapa[est]++;
+      else mapa[est] = (mapa[est] || 0) + 1; // estados no esperados
+    });
+    return mapa;
+  }
+
+  function estadoItems(datos) {
+    const mapa = contarEstados(datos);
+    const total = datos.length || 1;
+    return ESTADOS.map(e => `
+      <div class="dash-estado-item">
+        <div class="dash-estado-num">${mapa[e.key] || 0}</div>
+        <div class="dash-estado-lbl">${e.label}</div>
+        <div class="dash-estado-bar" style="background:${e.color};width:${Math.round(((mapa[e.key]||0)/total)*100)}%;min-width:${(mapa[e.key]||0)>0?'8px':'0'};"></div>
+      </div>`).join('');
+  }
+
+  $('mainContent').innerHTML=`
+    <div class="page-hd">
+      <h2>📊 Dashboard</h2>
+      <p>Resumen general – Secretaría de Salud Municipal de Jamundí</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card"><div class="stat-val">${pet.length}</div><div class="stat-lbl">Peticiones totales</div></div>
+      <div class="stat-card"><div class="stat-val">${ofi.length}</div><div class="stat-lbl">De oficio totales</div></div>
+      <div class="stat-card green"><div class="stat-val">${act.length}</div><div class="stat-lbl">Actas registradas</div></div>
+      <div class="stat-card rose"><div class="stat-val">${pet.filter(r=>(r.estado||'').trim()==='Sin oficio').length + ofi.filter(r=>(r.estado||'').trim()==='Sin oficio').length}</div><div class="stat-lbl">Sin oficio (total)</div></div>
+      <div class="stat-card green"><div class="stat-val">${pet.filter(r=>(r.estado||'').trim()==='Enviado').length + ofi.filter(r=>(r.estado||'').trim()==='Enviado').length}</div><div class="stat-lbl">Enviados (total)</div></div>
+    </div>
+
+    <div class="dash-section">
+      <div class="dash-section-hd">
+        <h3>📥 Peticiones</h3>
+        <span>${pet.length} registros</span>
+      </div>
+      <div class="dash-estado-grid">
+        ${estadoItems(pet)}
+      </div>
+    </div>
+
+    <div class="dash-section">
+      <div class="dash-section-hd">
+        <h3>📄 De Oficio</h3>
+        <span>${ofi.length} registros</span>
+      </div>
+      <div class="dash-estado-grid">
+        ${estadoItems(ofi)}
+      </div>
+    </div>
+
+    <div class="dash-section">
+      <div class="dash-section-hd" style="border-bottom:none;">
+        <h3>👤 ${esc(session.usuario)}</h3>
+        <span>Rol: <strong>${esc(session.rol)}</strong> · Usa el menú lateral para gestionar documentos</span>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER GENÉRICO CON CARDS EXPANDIBLES
+// ══════════════════════════════════════════════════════════════
+function renderCardTable(containerId, title, data, summaryKeys, expandKeys, canEdit, canDel, onAdd, onEdit, onDel){
+  // Filter by search
+  let filtered = [...data];
+  let pagina   = 1;
+
+  function getFiltered(q, estFilter){
+    return data.filter(r=>{
+      const okQ = !q || Object.values(r).some(v=>v&&String(v).toLowerCase().includes(q.toLowerCase()));
+      const okE = !estFilter || (r.estado||'').toLowerCase()===estFilter.toLowerCase();
+      return okQ && okE;
+    });
+  }
+
+  function renderPage(){
+    const q  = $(`search-${containerId}`) ? $(`search-${containerId}`).value : '';
+    const ef = $(`estFilt-${containerId}`) ? $(`estFilt-${containerId}`).value : '';
+    filtered = getFiltered(q, ef);
+    const inicio=(pagina-1)*POR_PAG, fin=Math.min(inicio+POR_PAG,filtered.length);
+    const slice=filtered.slice(inicio,fin);
+    const tbody=$(`tbody-${containerId}`);
+    if(!tbody) return;
+    if(!slice.length){
+      tbody.innerHTML=`<tr><td colspan="${summaryKeys.length+1}" class="tbl-empty">Sin registros</td></tr>`;
+    } else {
+      tbody.innerHTML='';
+      slice.forEach(row=>{
+        // Summary row
+        const tr=document.createElement('tr');
+        tr.className='pqrs-card-row';
+        tr.id=`row-${containerId}-${row.id}`;
+        let cells=summaryKeys.map(k=>{
+          const v=row[k]||'';
+          if(/estado|revision|aprobad|revisad/.test(k)) return `<td>${badgeHtml(v)}</td>`;
+          if(k==='adjuntos'){
+            // Renderizar adjuntos JSON como links pequeños: Adjunto 1, 2, 3...
+            let adj=[];
+            try{ adj=v?JSON.parse(v):[]; }catch(e){}
+            if(!adj.length) return `<td><span style="color:#cbd5e1;font-size:11px;">—</span></td>`;
+            const links=adj.map((a,i)=>`<a href="${esc(a.url)}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:600;color:#1a4b8c;background:#f0f4ff;border:1px solid #c7d7f9;border-radius:4px;padding:2px 6px;text-decoration:none;white-space:nowrap;" title="${esc(a.nombre)}">📎 ${i+1}</a>`).join(' ');
+            return `<td style="white-space:nowrap;">${links}</td>`;
+          }
+          if(/url/.test(k)&&v) return `<td><a class="link-doc" href="${esc(v)}" target="_blank" onclick="event.stopPropagation()">🔗 Ver</a></td>`;
+          return `<td title="${esc(v)}">${esc(v)}</td>`;
+        }).join('');
+        cells+=`<td class="td-actions">
+          ${canEdit?`<button class="btn-icon" onclick="event.stopPropagation();handleEdit('${containerId}',${row.id})" title="Editar">✏️</button>`:''}
+          ${canDel?`<button class="btn-icon del" onclick="event.stopPropagation();handleDel('${containerId}',${row.id})" title="Eliminar">🗑️</button>`:''}
+          <i class="chevron">▾</i>
+        </td>`;
+        tr.innerHTML=cells;
+        tr.onclick=()=>{ tr.classList.toggle('open'); };
+        tbody.appendChild(tr);
+        // Expand row
+        const exp=document.createElement('tr');
+        exp.className='pqrs-expand-row';
+        const expTd=document.createElement('td');
+        expTd.colSpan=summaryKeys.length+1;
+        const inner=document.createElement('div');
+        inner.className='expand-inner';
+        const content=document.createElement('div');
+        content.className='expand-content';
+        expandKeys.forEach(k=>{
+          const v=row[k]||'';
+          const f=document.createElement('div');
+          f.className='expand-field'+(k==='asunto'||k==='observaciones'?' full':'');
+          if(k==='adjuntos'){
+            let adj=[];
+            try{ adj=v?JSON.parse(v):[]; }catch(e){}
+            const linksHtml = adj.length
+              ? adj.map((a,i)=>`<a class="link-doc" href="${esc(a.url)}" target="_blank" title="${esc(a.nombre)}">📎 Adjunto ${i+1} — ${esc(a.nombre)}</a>`).join('<br>')
+              : '<span class="empty-val">Sin adjuntos</span>';
+            f.innerHTML=`<label>Adjuntos</label><span>${linksHtml}</span>`;
+          } else if(/url/.test(k)&&v){
+            f.innerHTML=`<label>${k.replace(/_/g,' ')}</label><span><a class="link-doc" href="${esc(v)}" target="_blank">🔗 Abrir enlace</a></span>`;
+          } else if(/estado|revision|aprobad|revisad/.test(k)){
+            f.innerHTML=`<label>${k.replace(/_/g,' ')}</label><span>${badgeHtml(v)}</span>`;
+          } else {
+            f.innerHTML=`<label>${k.replace(/_/g,' ')}</label><span class="${v?'':'empty-val'}">${v?esc(v):'Sin dato'}</span>`;
+          }
+          content.appendChild(f);
+        });
+        inner.appendChild(content);
+        expTd.appendChild(inner);
+        exp.appendChild(expTd);
+        tbody.appendChild(exp);
+      });
+    }
+    // Pagination
+    const total=Math.ceil(filtered.length/POR_PAG);
+    const pi=$(`pag-info-${containerId}`), pb=$(`pag-btns-${containerId}`);
+    if(pi) pi.textContent=`${filtered.length===0?0:inicio+1}–${fin} de ${filtered.length}`;
+    if(pb){
+      pb.innerHTML='';
+      const prev=document.createElement('button');
+      prev.className='pag-btn'; prev.textContent='← Ant.'; prev.disabled=pagina===1;
+      prev.onclick=()=>{pagina--;renderPage();};
+      pb.appendChild(prev);
+      paginasVis(pagina,total).forEach(p=>{
+        const b=document.createElement('button');
+        b.className='pag-btn'+(p===pagina?' active':'');
+        b.textContent=p;
+        b.onclick=()=>{pagina=p;renderPage();};
+        pb.appendChild(b);
+      });
+      const next=document.createElement('button');
+      next.className='pag-btn'; next.textContent='Sig. →'; next.disabled=pagina===total||total===0;
+      next.onclick=()=>{pagina++;renderPage();};
+      pb.appendChild(next);
+    }
+  }
+
+  // Build estados filter options
+  const estados=[...new Set(data.map(d=>d.estado).filter(Boolean))].sort();
+  const estOpts='<option value="">Todos los estados</option>'+estados.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
+
+  const headers=summaryKeys.map(k=>`<th>${k.replace(/_/g,' ').toUpperCase()}</th>`).join('');
+
+  $(containerId).innerHTML=`
+    <div class="page-hd"><h2>${title}</h2><p>${data.length} registro(s) en total</p></div>
+    <div class="tbl-card">
+      <div class="tbl-toolbar">
+        <h3>${title}</h3>
+        <div class="toolbar-right">
+          <div class="search-wrap">
+            <input class="search-box" id="search-${containerId}" placeholder="Buscar…"
+                   oninput="pagina=1;" onkeyup="document.getElementById('search-${containerId}')._rp&&document.getElementById('search-${containerId}')._rp()"/>
+          </div>
+          <select class="filtro-select" id="estFilt-${containerId}">${estOpts}</select>
+          ${(canEdit && onAdd)?`<button class="btn-add" onclick="handleAdd('${containerId}')">＋ Nuevo</button>`:''}
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>${headers}<th>Acciones</th></tr></thead>
+          <tbody id="tbody-${containerId}"></tbody>
+        </table>
+      </div>
+      <div class="paginacion">
+        <span class="pag-info" id="pag-info-${containerId}"></span>
+        <div class="pag-btns" id="pag-btns-${containerId}"></div>
+      </div>
+    </div>`;
+
+  // wire search and filter
+  const sbox=$(`search-${containerId}`);
+  const efil=$(`estFilt-${containerId}`);
+  const rp=()=>{pagina=1;renderPage();};
+  sbox._rp=rp;
+  sbox.addEventListener('input',rp);
+  efil.addEventListener('change',rp);
+  // wire edit/del callbacks
+  window[`_handleEdit_${containerId}`] = onEdit;
+  window[`_handleDel_${containerId}`]  = onDel;
+  window[`_handleAdd_${containerId}`]  = onAdd;
+  renderPage();
+}
+
+function paginasVis(actual,total){
+  if(total<=7) return Array.from({length:total},(_,i)=>i+1);
+  const s=new Set([1,total,actual]);
+  if(actual>1) s.add(actual-1);
+  if(actual<total) s.add(actual+1);
+  return [...s].sort((a,b)=>a-b);
+}
+
+function handleEdit(cid,id){ window[`_handleEdit_${cid}`](id); }
+function handleDel(cid,id) { window[`_handleDel_${cid}`](id); }
+function handleAdd(cid)    { window[`_handleAdd_${cid}`](); }
+
+// ══════════════════════════════════════════════════════════════
+// PETICIONES
+// ══════════════════════════════════════════════════════════════
+let _petData=[];
+async function renderPeticiones(){
+  $('mainContent').innerHTML='<div class="tbl-empty"><div class="spinner"></div>Cargando…</div>';
+  _petData = await call('getPeticionesFiltradas', session.nombre_completo || session.usuario, session.rol);
+  const canEdit = ['administrador','cargador','revisor','aprobador'].includes(session.rol);
+  const canDel  = session.rol === 'administrador';
+  const canAdd  = session.rol === 'administrador';
+  const summary  = ['estado','radicado_entra','radicado_sale','fecha_entra','responsable','url_editable','adjuntos'];
+  const expandAll= ['id','tipo_doc','comprobante','fecha_sale','asunto','observaciones',
+                    'nombre_elabora','nombre_proyecta','nombre_revisa','estado_revision',
+                    'nombre_aprueba','estado_aprovado','url_anexos',
+                    'comprobante_entrega_responsable'];
+  renderCardTable('mainContent','📋 Peticiones',_petData,summary,expandAll,canEdit,canDel,
+    canAdd ? ()=>openPeticionModal(null) : null,
+    id=>openPeticionModal(_petData.find(r=>r.id==id)),
+    id=>confirmDel(()=>{ call('deletePeticion',id).then(()=>{ showToast('Eliminado'); renderPeticiones(); }); })
+  );
+}
+
+// ── Lógica automática de estado para Peticiones ───────────────
+// Sin oficio → (url_editable lleno) → Sin revision
+// → (estado_revision === 'Revisado') → Sin aprobación
+// → (estado_aprovado === 'Aprobado') → Para imprimir
+function calcularEstadoPeticion(obj){
+  const urlEditable   = (obj.url_editable   || '').trim();
+  const estadoRevision= (obj.estado_revision|| '').trim();
+  const estadoAprobado= (obj.estado_aprovado|| '').trim();
+  const comprobante   = (obj.comprobante    || '').trim().toLowerCase();
+  if (comprobante === 'ok')                   return 'Enviado';
+  if (estadoAprobado === 'Aprobado')          return 'Para imprimir';
+  if (estadoRevision === 'Revisado')          return 'Sin aprobación';
+  if (urlEditable !== '')                     return 'Sin revision';
+  return 'Sin oficio';
+}
+
+async function openPeticionModal(row){
+  const v=row||{};
+  $('modalTitle').textContent = row?'Editar Petición':'Nueva Petición';
+  const estadoActual = row ? (v.estado||'Sin oficio') : 'Sin oficio';
+
+  let listas = { elabora:[], proyecta:[], revisa:[] };
+  try { listas = await call('getUsuariosPorRol'); } catch(e){}
+
+  const selOpts = (arr, current) =>
+    `<option value="">— Seleccionar —</option>` +
+    arr.map(u=>`<option ${current===u?'selected':''}>${esc(u)}</option>`).join('');
+
+  $('modalBody').innerHTML=`
+    <div class="form-grid">
+      <div class="field g-full" style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;flex-direction:row;align-items:center;gap:10px;">
+        <span style="font-size:12px;font-weight:700;color:#0369a1;text-transform:uppercase;letter-spacing:.05em;">Estado actual</span>
+        <span>${badgeHtml(estadoActual)}</span>
+        <span style="font-size:11px;color:#64748b;margin-left:auto;">El estado se actualiza automáticamente según los campos</span>
+      </div>
+      <div class="field"><label>Tipo Documento</label>
+        <select name="tipo_doc">
+          <option value="">— Seleccionar —</option>
+          ${['PROGRAMACION','OFICIO','CIR. INFORMATIVA','CIR. NORMATIVA','SOLICITUD','ENTES CONTROL','O.S','DERECHO PETICION','INVITACION','QUEJA','ANONIMO','PQR','DENUNCIA'].map(o=>`<option ${v.tipo_doc===o?'selected':''}>${esc(o)}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>Radicado Entra</label><input name="radicado_entra" id="pet_radicado_entra" value="${esc(v.radicado_entra||'')}"/></div>
+      <div class="field"><label>Radicado Sale</label><input name="radicado_sale" value="${esc(v.radicado_sale||'')}"/></div>
+      <div class="field"><label>Fecha Entra</label><input type="date" name="fecha_entra" id="pet_fecha_entra" value="${esc(v.fecha_entra||'')}"/></div>
+      <div class="field"><label>Fecha Sale</label><input type="date" name="fecha_sale" value="${esc(v.fecha_sale||'')}"/></div>
+      <div class="field"><label>Comprobante</label>
+        <select name="comprobante" id="pet_comprobante" onchange="actualizarEstadoPreview()">
+          <option value="">— Seleccionar —</option>
+          ${['Pendiente','No requiere respuesta','Tramite terminado','Remitido por competencia','Ok'].map(o=>`<option ${v.comprobante===o?'selected':''}>${o}</option>`).join('')}
+        </select></div>
+      <div class="field">
+        <label>Responsable</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select name="responsable" id="pet_responsable" style="flex:1;">${selOpts(listas.responsable, v.responsable)}</select>
+          ${v.comprobante_entrega_responsable
+            ? `<a class="btn-ver-correo" id="btnVerCorreo" href="${esc(v.comprobante_entrega_responsable)}" target="_blank">📧 Ver correo</a>`
+            : `<span id="btnVerCorreo" style="display:none"></span>`
+          }
+        </div>
+      </div>
+      <div class="field g-full"><label>Asunto</label><textarea name="asunto" id="pet_asunto">${esc(v.asunto||'')}</textarea></div>
+      <div class="field g-full"><label>Observaciones</label><textarea name="observaciones">${esc(v.observaciones||'')}</textarea></div>
+      ${adjuntosFieldHtml(v.adjuntos ? (()=>{ try{ return JSON.parse(v.adjuntos); }catch(e){ return []; } })() : [])}
+      <div class="field">
+        <label>Nombre Elabora</label>
+        <select name="nombre_elabora">${selOpts(listas.elabora, v.nombre_elabora)}</select>
+      </div>
+      <div class="field">
+        <label>Proyecta</label>
+        <select name="nombre_proyecta">${selOpts(listas.proyecta, v.nombre_proyecta)}</select>
+      </div>
+      ${urlEditableFieldHtml('url_editable','pet_url_editable',v.url_editable)}
+      <div class="field">
+        <label>Nombre Revisa</label>
+        <select name="nombre_revisa" onchange="checkGenerarOficioBtn()">${selOpts(listas.revisa, v.nombre_revisa)}</select>
+      </div>
+      <div class="field"><label>Estado Revisión</label>
+        <select name="estado_revision" id="pet_estado_revision" onchange="actualizarEstadoPreview()">
+          <option value="">—</option>
+          ${['Revisado','Pendiente','Rechazado'].map(o=>`<option ${v.estado_revision===o?'selected':''}>${o}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>Nombre Aprueba</label>
+        <select name="nombre_aprueba" onchange="checkGenerarOficioBtn()">${selOpts(listas.aprueba, v.nombre_aprueba)}</select>
+      </div>
+      <div class="field"><label>Estado Aprobado</label>
+        <select name="estado_aprovado" id="pet_estado_aprovado" onchange="actualizarEstadoPreview()">
+          <option value="">—</option>
+          ${['Aprobado','Pendiente','Rechazado'].map(o=>`<option ${v.estado_aprovado===o?'selected':''}>${o}</option>`).join('')}
+        </select></div>
+      ${uploadFieldHtml('url_anexos','pet_url_anexos','URL Anexos',v.url_anexos)}
+    </div>`;
+
+  modalSaveCb = async()=>{
+    const obj=collectForm();
+    if(row) obj.id=row.id;
+    obj.adjuntos = getAdjuntosJson();
+    obj.estado = calcularEstadoPeticion(obj);
+    const result = await call('savePeticion',obj);
+    showToast(`Petición ${row?'actualizada':'creada'} — Estado: ${obj.estado}`);
+    // Si el backend envió el correo automáticamente, actualizar el botón
+    if (result && result.urlCorreo) {
+      const placeholder = $('btnVerCorreo');
+      if (placeholder) {
+        const a = document.createElement('a');
+        a.className = 'btn-ver-correo';
+        a.id        = 'btnVerCorreo';
+        a.href      = result.urlCorreo;
+        a.target    = '_blank';
+        a.innerHTML = '📧 Ver correo';
+        placeholder.replaceWith(a);
+      }
+      showToast('📧 Notificación enviada a ' + obj.responsable);
+    }
+  };
+  _modalContexto = 'peticion';
+  _modalOnClose  = ()=> renderPeticiones();
+  openModal();
+  initAdjuntos(v.adjuntos ? (()=>{ try{ return JSON.parse(v.adjuntos); }catch(e){ return []; } })() : []);
+  bindUploadListeners();
+  if (session.rol === 'cargador')  lockFieldsForRole(CARGADOR_CAMPOS_PETICION);
+  if (session.rol === 'revisor')  { lockFieldsForRole(REVISOR_CAMPOS_PETICION);   hidePillDelete(); }
+  if (session.rol === 'aprobador'){ lockFieldsForRole(APROBADOR_CAMPOS_PETICION); hidePillDelete(); }
+  document.querySelectorAll('[name="nombre_elabora"],[name="nombre_proyecta"]').forEach(el=>{
+    el.addEventListener('change', checkGenerarOficioBtn);
+  });
+  checkGenerarOficioBtn();
+}
+
+// Actualiza el badge de estado en tiempo real dentro del modal
+function actualizarEstadoPreview(){
+  const urlEl  = $('pet_url_editable_url');
+  const revEl  = $('pet_estado_revision');
+  const apbEl  = $('pet_estado_aprovado');
+  const cmpEl  = $('pet_comprobante');
+  if(!urlEl) return;
+  const obj = {
+    url_editable:    urlEl.value,
+    estado_revision: revEl ? revEl.value : '',
+    estado_aprovado: apbEl ? apbEl.value : '',
+    comprobante:     cmpEl ? cmpEl.value : ''
+  };
+  const nuevoEstado = calcularEstadoPeticion(obj);
+  const preview = $('modalBody').querySelector('.g-full span:nth-child(2)');
+  if(preview) preview.innerHTML = badgeHtml(nuevoEstado);
+}
+
+// ══════════════════════════════════════════════════════════════
+// DE OFICIO
+// ══════════════════════════════════════════════════════════════
+let _ofData=[];
+async function renderDeOficio(){
+  $('mainContent').innerHTML='<div class="tbl-empty"><div class="spinner"></div>Cargando…</div>';
+  _ofData = await call('getDeOficioFiltrado', session.nombre_completo || session.usuario, session.rol);
+  const canEdit = ['administrador','cargador','revisor','aprobador'].includes(session.rol);
+  const canDel  = session.rol === 'administrador';
+  const canAdd  = ['administrador','cargador'].includes(session.rol);
+  const summary  = ['estado','radicado_sale','asunto','url_anexos','url_editable'];
+  const expandAll= ['id','fecha_sale','tipo_doc','comprobante','nombre_elabora','nombre_proyecta','nombre_revisa','estado_revisado','nombre_aprueba','estado_aprobado'];
+  renderCardTable('mainContent','📄 Documentos De Oficio',_ofData,summary,expandAll,canEdit,canDel,
+    canAdd ? ()=>openOficioModal(null) : null,
+    id=>openOficioModal(_ofData.find(r=>r.id==id)),
+    id=>confirmDel(()=>{ call('deleteDeOficio',id).then(()=>{ showToast('Eliminado'); renderDeOficio(); }); })
+  );
+}
+
+// ── Lógica automática de estado para De Oficio ────────────────
+function calcularEstadoOficio(obj){
+  const urlEditable    = (obj.url_editable   || '').trim();
+  const estadoRevisado = (obj.estado_revisado|| '').trim();
+  const estadoAprobado = (obj.estado_aprobado|| '').trim();
+  const comprobante    = (obj.comprobante    || '').trim().toLowerCase();
+  if (comprobante === 'ok')                                                  return 'Enviado';
+  if (estadoAprobado === 'Aprobado')                                         return 'Para imprimir';
+  // Sin sisnet: revisado + url_editable listo, pero aún sin aprobación registrada en sisnet
+  if (estadoRevisado === 'Revisado' && urlEditable !== '')                   return 'Sin sisnet';
+  if (estadoRevisado === 'Revisado')                                         return 'Sin aprobación';
+  if (urlEditable !== '')                                                    return 'Sin revision';
+  return 'Sin oficio';
+}
+
+async function openOficioModal(row){
+  const v=row||{};
+  $('modalTitle').textContent = row?'Editar De Oficio':'Nuevo De Oficio';
+  const estadoActual = row ? (v.estado||'Sin oficio') : 'Sin oficio';
+
+  let listas = { elabora:[], proyecta:[], revisa:[] };
+  try { listas = await call('getUsuariosPorRol'); } catch(e){}
+
+  const selOpts = (arr, current) =>
+    `<option value="">— Seleccionar —</option>` +
+    arr.map(u=>`<option ${current===u?'selected':''}>${esc(u)}</option>`).join('');
+
+  $('modalBody').innerHTML=`
+    <div class="form-grid">
+      <div class="field g-full" style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:8px;padding:10px 14px;flex-direction:row;align-items:center;gap:10px;">
+        <span style="font-size:12px;font-weight:700;color:#0369a1;text-transform:uppercase;letter-spacing:.05em;">Estado actual</span>
+        <span>${badgeHtml(estadoActual)}</span>
+        <span style="font-size:11px;color:#64748b;margin-left:auto;">El estado se actualiza automáticamente según los campos</span>
+      </div>
+      <div class="field"><label>Tipo Documento</label>
+        <select name="tipo_doc">
+          <option value="">— Seleccionar —</option>
+          ${['PROGRAMACION','OFICIO','CIR. INFORMATIVA','CIR. NORMATIVA','SOLICITUD','ENTES CONTROL','O.S','DERECHO PETICION','INVITACION','QUEJA','ANONIMO','PQR','DENUNCIA'].map(o=>`<option ${v.tipo_doc===o?'selected':''}>${esc(o)}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>Radicado Sale</label><input name="radicado_sale" value="${esc(v.radicado_sale||'')}"/></div>
+      <div class="field"><label>Fecha Sale</label><input type="date" name="fecha_sale" value="${esc(v.fecha_sale||'')}"/></div>
+      <div class="field"><label>Comprobante</label>
+        <select name="comprobante" id="of_comprobante" onchange="actualizarEstadoPreviewOficio()">
+          <option value="">— Seleccionar —</option>
+          ${['Pendiente','No requiere respuesta','Tramite terminado','Remitido por competencia','Ok'].map(o=>`<option ${v.comprobante===o?'selected':''}>${o}</option>`).join('')}
+        </select></div>
+      <div class="field g-full"><label>Asunto</label><textarea name="asunto">${esc(v.asunto||'')}</textarea></div>
+      <div class="field">
+        <label>Nombre Elabora</label>
+        <select name="nombre_elabora">${selOpts(listas.elabora, v.nombre_elabora)}</select>
+      </div>
+      <div class="field">
+        <label>Proyecta</label>
+        <select name="nombre_proyecta">${selOpts(listas.proyecta, v.nombre_proyecta)}</select>
+      </div>
+      ${urlEditableFieldHtml('url_editable','of_url_editable',v.url_editable)}
+      <div class="field">
+        <label>Nombre Revisa</label>
+        <select name="nombre_revisa" onchange="checkGenerarOficioBtn()">${selOpts(listas.revisa, v.nombre_revisa)}</select>
+      </div>
+      <div class="field"><label>Estado Revisado</label>
+        <select name="estado_revisado" id="of_estado_revisado" onchange="actualizarEstadoPreviewOficio()">
+          <option value="">—</option>
+          ${['Revisado','Pendiente','Rechazado'].map(o=>`<option ${v.estado_revisado===o?'selected':''}>${o}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>Nombre Aprueba</label>
+        <select name="nombre_aprueba" onchange="checkGenerarOficioBtn()">${selOpts(listas.aprueba, v.nombre_aprueba)}</select>
+      </div>
+      <div class="field"><label>Estado Aprobado</label>
+        <select name="estado_aprobado" id="of_estado_aprobado" onchange="actualizarEstadoPreviewOficio()">
+          <option value="">—</option>
+          ${['Aprobado','Pendiente','Rechazado'].map(o=>`<option ${v.estado_aprobado===o?'selected':''}>${o}</option>`).join('')}
+        </select></div>
+      ${uploadFieldHtml('url_anexos','of_url_anexos','URL Anexos',v.url_anexos)}
+    </div>`;
+  modalSaveCb = async()=>{
+    const obj=collectForm(); if(row) obj.id=row.id;
+    obj.estado = calcularEstadoOficio(obj);
+    await call('saveDeOficio',obj);
+    showToast(`Documento ${row?'actualizado':'creado'} — Estado: ${obj.estado}`);
+  };
+  _modalContexto = 'deoficio';
+  _modalOnClose  = ()=> renderDeOficio();
+  openModal();
+  bindUploadListeners();
+  if (session.rol === 'cargador')  lockFieldsForRole(CARGADOR_CAMPOS_OFICIO);
+  if (session.rol === 'revisor')  { lockFieldsForRole(REVISOR_CAMPOS_OFICIO);   hidePillDelete(); }
+  if (session.rol === 'aprobador'){ lockFieldsForRole(APROBADOR_CAMPOS_OFICIO); hidePillDelete(); }
+  document.querySelectorAll('[name="nombre_elabora"],[name="nombre_proyecta"]').forEach(el=>{
+    el.addEventListener('change', checkGenerarOficioBtn);
+  });
+  checkGenerarOficioBtn();
+}
+
+function actualizarEstadoPreviewOficio(){
+  const urlEl = $('of_url_editable_url');
+  const revEl = $('of_estado_revisado');
+  const apbEl = $('of_estado_aprobado');
+  const cmpEl = $('of_comprobante');
+  if(!urlEl) return;
+  const obj = {
+    url_editable:    urlEl.value,
+    estado_revisado: revEl ? revEl.value : '',
+    estado_aprobado: apbEl ? apbEl.value : '',
+    comprobante:     cmpEl ? cmpEl.value : ''
+  };
+  const nuevoEstado = calcularEstadoOficio(obj);
+  const preview = $('modalBody').querySelector('.g-full span:nth-child(2)');
+  if(preview) preview.innerHTML = badgeHtml(nuevoEstado);
+}
+
+// ══════════════════════════════════════════════════════════════
+// ACTAS
+// ══════════════════════════════════════════════════════════════
+let _actData=[];
+async function renderActas(){
+  $('mainContent').innerHTML='<div class="tbl-empty"><div class="spinner"></div>Cargando…</div>';
+  _actData = await call('getConsecutivosActas');
+  const canEdit = ['administrador','cargador'].includes(session.rol);
+  const canDel  = session.rol==='administrador';
+  const summary  = ['id','numero_acta','estado','fecha','responsable'];
+  const expandAll= ['asunto','anexo','url_editable'];
+  renderCardTable('mainContent','📑 Consecutivos de Actas',_actData,summary,expandAll,canEdit,canDel,
+    ()=>openActaModal(null),
+    id=>openActaModal(_actData.find(r=>r.id==id)),
+    id=>confirmDel(()=>{ call('deleteActa',id).then(()=>{ showToast('Eliminado'); renderActas(); }); })
+  );
+}
+
+function openActaModal(row){
+  const v=row||{};
+  $('modalTitle').textContent = row?'Editar Acta':'Nueva Acta';
+  $('modalBody').innerHTML=`
+    <div class="form-grid">
+      <div class="field"><label>Número Acta</label><input name="numero_acta" value="${esc(v.numero_acta||'')}"/></div>
+      <div class="field"><label>Estado</label>
+        <select name="estado">
+          ${['Activo','Inactivo','Archivado'].map(o=>`<option ${v.estado===o?'selected':''}>${o}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>Fecha</label><input type="date" name="fecha" value="${esc(v.fecha||'')}"/></div>
+      <div class="field"><label>Responsable</label><input name="responsable" value="${esc(v.responsable||'')}"/></div>
+      <div class="field g-full"><label>Asunto</label><textarea name="asunto">${esc(v.asunto||'')}</textarea></div>
+      <div class="field"><label>Anexo</label><input name="anexo" value="${esc(v.anexo||'')}"/></div>
+      <div class="field"><label>URL Editable</label><input name="url_editable" value="${esc(v.url_editable||'')}"/></div>
+    </div>`;
+  modalSaveCb = async()=>{
+    const obj=collectForm(); if(row) obj.id=row.id;
+    await call('saveActa',obj);
+    showToast(row?'Acta actualizada':'Acta creada');
+  };
+  _modalOnClose = ()=> renderActas();
+  openModal();
+}
+
+// ══════════════════════════════════════════════════════════════
+// USUARIOS
+// ══════════════════════════════════════════════════════════════
+let _usrData=[];
+async function renderUsuarios(){
+  if(session.rol!=='administrador'){
+    $('mainContent').innerHTML='<div class="tbl-empty">⛔ Sin acceso</div>'; return;
+  }
+  $('mainContent').innerHTML='<div class="tbl-empty"><div class="spinner"></div>Cargando…</div>';
+  _usrData = await call('getUsuarios');
+  const summary  = ['id','usuario','rol'];
+  const expandAll= [];
+  renderCardTable('mainContent','👥 Usuarios del Sistema',_usrData,summary,expandAll,true,true,
+    ()=>openUsuarioModal(null),
+    id=>openUsuarioModal(_usrData.find(r=>r.id==id)),
+    id=>confirmDel(()=>{ call('deleteUsuario',id).then(()=>{ showToast('Usuario eliminado'); renderUsuarios(); }); })
+  );
+}
+
+function openUsuarioModal(row){
+  const v=row||{};
+  $('modalTitle').textContent = row?'Editar Usuario':'Nuevo Usuario';
+  $('modalBody').innerHTML=`
+    <div class="form-grid">
+      <div class="field"><label>Usuario</label><input name="usuario" value="${esc(v.usuario||'')}"/></div>
+      <div class="field"><label>Contraseña</label><input type="password" name="contrasena" placeholder="(sin cambio si está vacío)"/></div>
+      <div class="field"><label>Rol</label>
+        <select name="rol">
+          ${['administrador','revisor','aprobador','cargador'].map(o=>`<option ${v.rol===o?'selected':''}>${o}</option>`).join('')}
+        </select></div>
+    </div>`;
+  modalSaveCb = async()=>{
+    const obj=collectForm(); if(row) obj.id=row.id;
+    if(!obj.contrasena && row) delete obj.contrasena;
+    await call('saveUsuario',obj);
+    showToast(row?'Usuario actualizado':'Usuario creado');
+  };
+  _modalOnClose = ()=> renderUsuarios();
+  openModal();
+}
+
+// ══════════════════════════════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════════════════════════════
+let _modalOnClose = null;
+
+function openModal()  {
+  $('modalOverlay').classList.add('open');
+  const btn = $('btnGenerarOficio');
+  if(btn){ btn.style.display='none'; btn.className='btn-generar disabled'; btn.disabled=true; btn.innerHTML='✦ Generar oficio'; }
+}
+async function closeModal() {
+  if (modalSaveCb) {
+    try { await modalSaveCb(); }
+    catch(e) { showToast('Error al guardar: ' + e.message, 'err'); }
+  }
+  $('modalOverlay').classList.remove('open');
+  if (_modalOnClose) { const fn = _modalOnClose; _modalOnClose = null; fn(); }
+  _modalContexto = null;
+  modalSaveCb    = null;
+}
+async function submitModal(){
+  // Guardar explícitamente y cerrar
+  await closeModal();
+}
+function collectForm(){
+  const obj={};
+  $('modalBody').querySelectorAll('[name]').forEach(el=>{ obj[el.name]=el.value; });
+  return obj;
+}
+
+// ══════════════════════════════════════════════════════════════
+// URL EDITABLE — solo botón abrir (sin eliminar)
+// ══════════════════════════════════════════════════════════════
+function urlEditableFieldHtml(fieldName, fieldId, currentVal) {
+  const hasUrl = !!(currentVal && currentVal.trim());
+  const hidden = `<input type="hidden" name="${fieldName}" id="${fieldId}_url" value="${esc(currentVal||'')}"/>`;
+
+  if (hasUrl) {
+    return `
+      <div class="field g-full">
+        <label>URL Editable</label>
+        <div class="url-editable-wrap">
+          ${hidden}
+          <a class="url-editable-btn con-oficio" href="${esc(currentVal)}" target="_blank">
+            <span class="url-editable-icon">📝</span>
+            <span>Abrir documento editable</span>
+            <span style="margin-left:auto;font-size:11px;opacity:.8;">Google Docs ↗</span>
+          </a>
+        </div>
+      </div>`;
+  } else {
+    return `
+      <div class="field g-full">
+        <label>URL Editable</label>
+        <div class="url-editable-wrap">
+          ${hidden}
+          <div class="url-editable-btn sin-oficio">
+            <span class="url-editable-icon">📄</span>
+            <span>Sin oficio editable — usa "Generar oficio" para crear uno</span>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// BOTÓN GENERAR OFICIO — activación y lógica
+// ══════════════════════════════════════════════════════════════
+
+// Llama a esta función cada vez que cambia un select relevante en el modal
+function checkGenerarOficioBtn() {
+  const btn = $('btnGenerarOficio');
+  if (!btn) return;
+
+  const elabora  = document.querySelector('[name="nombre_elabora"]');
+  const proyecta = document.querySelector('[name="nombre_proyecta"]');
+  const revisa   = document.querySelector('[name="nombre_revisa"]');
+  const aprueba  = document.querySelector('[name="nombre_aprueba"]');
+
+  // Si el modal no tiene estos campos, ocultar el botón
+  if (!elabora || !proyecta || !revisa || !aprueba) {
+    btn.style.display = 'none';
+    return;
+  }
+
+  // Si ya existe un url_editable, el oficio ya fue generado — ocultar permanentemente
+  const prefix    = _modalContexto === 'peticion' ? 'pet' : 'of';
+  const urlEditEl = $(`${prefix}_url_editable_url`);
+  if (urlEditEl && urlEditEl.value && urlEditEl.value.trim()) {
+    btn.style.display = 'none';
+    return;
+  }
+
+  btn.style.display = '';
+  const listo = elabora.value && proyecta.value && revisa.value && aprueba.value;
+  if (listo) {
+    btn.className = 'btn-generar enabled';
+    btn.disabled  = false;
+  } else {
+    btn.className = 'btn-generar disabled';
+    btn.disabled  = true;
+  }
+}
+
+// Contexto del modal activo (peticiones o deoficio)
+let _modalContexto = null;
+
+async function handleGenerarOficio() {
+  const btn = $('btnGenerarOficio');
+  if (!btn || btn.disabled) return;
+
+  const elabora  = document.querySelector('[name="nombre_elabora"]');
+  const proyecta = document.querySelector('[name="nombre_proyecta"]');
+  const revisa   = document.querySelector('[name="nombre_revisa"]');
+  const aprueba  = document.querySelector('[name="nombre_aprueba"]');
+  const asuntoEl = document.querySelector('[name="asunto"]');
+
+  // Determinar url_anexos según contexto
+  const fieldPrefix = _modalContexto === 'peticion' ? 'pet' : 'of';
+  const anexosEl    = $(`${fieldPrefix}_url_anexos_url`);
+
+  const params = {
+    nombre_elabora:  elabora  ? elabora.value  : '',
+    nombre_proyecta: proyecta ? proyecta.value : '',
+    nombre_revisa:   revisa   ? revisa.value   : '',
+    nombre_aprueba:  aprueba  ? aprueba.value  : '',
+    asunto:          asuntoEl ? asuntoEl.value  : '',
+    url_anexos:      anexosEl ? anexosEl.value  : ''
+  };
+
+  // Estado: cargando
+  btn.className   = 'btn-generar loading';
+  btn.disabled    = true;
+  btn.innerHTML   = '<div class="generar-spinner"></div> Generando…';
+
+  try {
+    const result = await call('generarOficio', params);
+    if (result.ok) {
+      // Actualizar el campo url_editable en el modal con la URL generada
+      const urlEditEl = $(`${fieldPrefix}_url_editable_url`);
+      if (urlEditEl) {
+        urlEditEl.value = result.url;
+        // Actualizar el widget visual
+        const wrap = urlEditEl.closest('.url-editable-wrap') || urlEditEl.parentElement;
+        if (wrap) {
+          // Reemplazar el div "sin oficio" por botón "con oficio"
+          const old = wrap.querySelector('.url-editable-btn');
+          if (old) {
+            const a = document.createElement('a');
+            a.className   = 'url-editable-btn con-oficio';
+            a.href        = result.url;
+            a.target      = '_blank';
+            a.innerHTML   = `<span class="url-editable-icon">📝</span><span>Abrir documento editable</span><span style="margin-left:auto;font-size:11px;opacity:.8;">Google Docs ↗</span>`;
+            old.replaceWith(a);
+          }
+        }
+        // Actualizar preview de estado
+        if (_modalContexto === 'peticion') actualizarEstadoPreview();
+        else actualizarEstadoPreviewOficio();
+      }
+      showToast(`✦ Oficio generado: "${result.nombre}"`);
+      // Ocultar el botón — ya no se necesita
+      if(btn){ btn.style.display = 'none'; }
+    } else {
+      showToast('❌ Error al generar: ' + (result.message || 'Error desconocido'), 'err');
+    }
+  } catch(e) {
+    showToast('❌ Error: ' + e.message, 'err');
+  } finally {
+    btn.innerHTML = '✦ Generar oficio';
+    checkGenerarOficioBtn(); // restaurar estado correcto
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// UPLOAD A DRIVE — sistema de pill
+// ══════════════════════════════════════════════════════════════
+
+// Extrae el nombre legible de una URL de Drive o cualquier URL
+function nombreDeUrl(url){
+  if(!url) return '';
+  // Google Drive: /file/d/ID/view → usar el ID como fallback
+  const m = url.match(/\/file\/d\/([^/]+)/);
+  if(m) return 'Archivo en Drive';
+  // Último segmento de la URL
+  try {
+    const u = new URL(url);
+    const parts = u.pathname.split('/').filter(Boolean);
+    return decodeURIComponent(parts[parts.length-1] || 'Archivo');
+  } catch(e){ return 'Archivo adjunto'; }
+}
+
+// Genera el HTML completo del widget para un campo de URL
+function uploadFieldHtml(fieldName, fieldId, label, currentVal, onChangeCallback){
+  const hasFile = !!currentVal;
+  const nombre  = hasFile ? nombreDeUrl(currentVal) : '';
+  const cbAttr  = onChangeCallback ? `oninput="${onChangeCallback}"` : '';
+  return `
+    <div class="field g-full">
+      <label>${label}</label>
+      <div class="upload-wrap" id="${fieldId}_wrap">
+        <!-- URL oculta (valor real que se guarda) -->
+        <input type="hidden" name="${fieldName}" id="${fieldId}_url" value="${esc(currentVal||'')}"/>
+        <input type="file" class="upload-file-input" id="${fieldId}_file"/>
+
+        <!-- Zona vacía (visible cuando no hay archivo) -->
+        <div class="upload-empty" id="${fieldId}_empty" style="${hasFile?'display:none;':''}">
+          <span class="ue-icon">📎</span>
+          <span class="ue-text">Sin archivo adjunto</span>
+          <button type="button" class="btn-upload" onclick="triggerUpload('${fieldId}')">⬆ Subir archivo</button>
+        </div>
+
+        <!-- Pill (visible cuando hay archivo) -->
+        <div class="upload-pill${hasFile?' show':''}" id="${fieldId}_pill">
+          <span class="pill-icon">📄</span>
+          <span class="pill-name" id="${fieldId}_name">${esc(nombre)}</span>
+          <div class="pill-actions">
+            <a class="btn-pill-open" id="${fieldId}_openBtn" href="${esc(currentVal||'#')}" target="_blank">🔗 Abrir</a>
+            <button type="button" class="btn-pill-del" onclick="clearUploadField('${fieldId}'${onChangeCallback?`,'${onChangeCallback}'`:''})">✕ Eliminar</button>
+          </div>
+        </div>
+
+        <!-- Estado subida -->
+        <div class="upload-status" id="${fieldId}_status"></div>
+      </div>
+    </div>`;
+}
+
+function triggerUpload(fieldId){
+  document.getElementById(fieldId + '_file').click();
+}
+
+function clearUploadField(fieldId, onChangeCb){
+  document.getElementById(fieldId + '_url').value   = '';
+  document.getElementById(fieldId + '_pill').classList.remove('show');
+  document.getElementById(fieldId + '_empty').style.display = '';
+  document.getElementById(fieldId + '_name').textContent    = '';
+  document.getElementById(fieldId + '_openBtn').href        = '#';
+  if(onChangeCb) window[onChangeCb] && window[onChangeCb]();
+  // Disparar callbacks de estado si aplica
+  if(fieldId === 'pet_url_editable') actualizarEstadoPreview();
+  if(fieldId === 'of_url_editable')  actualizarEstadoPreviewOficio();
+}
+
+function bindUploadListeners(){
+  ['pet_url_editable','pet_url_anexos','of_url_editable','of_url_anexos'].forEach(fid => {
+    const fi = document.getElementById(fid + '_file');
+    if(fi) fi.addEventListener('change', () => handleFileUpload(fid));
+  });
+}
+
+async function handleFileUpload(fieldId){
+  const fileInput = document.getElementById(fieldId + '_file');
+  const urlInput  = document.getElementById(fieldId + '_url');
+  const statusEl  = document.getElementById(fieldId + '_status');
+  const uploadBtn = document.getElementById(fieldId + '_empty')?.querySelector('.btn-upload');
+  if(!fileInput || !fileInput.files[0]) return;
+
+  const file = fileInput.files[0];
+  if(file.size > 20 * 1024 * 1024){
+    showStatus(statusEl, 'error', '❌ El archivo supera el límite de 20 MB'); return;
+  }
+
+  showStatus(statusEl, 'uploading', '⏳ Subiendo archivo…');
+  if(uploadBtn) uploadBtn.disabled = true;
+
+  try {
+    const base64 = await fileToBase64(file);
+    const result = await call('subirArchivoDrive', {
+      nombre:   file.name,
+      mimeType: file.type || 'application/octet-stream',
+      data:     base64
+    });
+    if(result.ok){
+      // Actualizar valor oculto
+      urlInput.value = result.url;
+      // Mostrar pill
+      document.getElementById(fieldId + '_pill').classList.add('show');
+      document.getElementById(fieldId + '_empty').style.display = 'none';
+      document.getElementById(fieldId + '_name').textContent    = result.nombre;
+      document.getElementById(fieldId + '_openBtn').href        = result.url;
+      showStatus(statusEl, '', ''); // limpiar
+      statusEl.style.display = 'none';
+      // Actualizar preview estado
+      if(fieldId === 'pet_url_editable') actualizarEstadoPreview();
+      if(fieldId === 'of_url_editable')  actualizarEstadoPreviewOficio();
+    } else {
+      showStatus(statusEl, 'error', '❌ Error: ' + result.message);
+    }
+  } catch(e){
+    showStatus(statusEl, 'error', '❌ Error al subir: ' + e.message);
+  } finally {
+    if(uploadBtn) uploadBtn.disabled = false;
+    fileInput.value = '';
+  }
+}
+
+function showStatus(el, type, msg){
+  if(!el) return;
+  if(!type){ el.className='upload-status'; el.innerHTML=''; return; }
+  el.className = 'upload-status ' + type;
+  el.innerHTML = type === 'uploading'
+    ? `<div class="upload-spinner"></div><span>${msg}</span>`
+    : `<span>${msg}</span>`;
+  if(type === 'error') setTimeout(()=>{ el.className='upload-status'; el.innerHTML=''; }, 5000);
+}
+
+function fileToBase64(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.readAsDataURL(file);
+    r.onload  = () => res(r.result.split(',')[1]);
+    r.onerror = err => rej(err);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONTROL DE CAMPOS POR ROL
+// ══════════════════════════════════════════════════════════════
+
+function lockFieldsForRole(editableNames) {
+  const modal = $('modalBody');
+  if (!modal) return;
+
+  const LOCK_STYLE = 'background:#f1f5f9;color:#94a3b8;cursor:not-allowed;border-color:#e2e8f0;pointer-events:none;';
+
+  modal.querySelectorAll('input:not([type=hidden]), select, textarea').forEach(el => {
+    const name = el.name || '';
+    if (!name || editableNames.includes(name)) return;
+
+    if (el.tagName === 'SELECT') {
+      // Selects: no se pueden hacer readonly — los reemplazamos por un input visual
+      // y añadimos hidden input para que collectForm recoja el valor
+      const val  = el.value;
+      const text = el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : val;
+      const hidden = document.createElement('input');
+      hidden.type  = 'hidden';
+      hidden.name  = name;
+      hidden.value = val;
+      const visual = document.createElement('input');
+      visual.type  = 'text';
+      visual.value = text || '—';
+      visual.readOnly = true;
+      visual.setAttribute('style', LOCK_STYLE);
+      el.parentNode.insertBefore(hidden, el);
+      el.parentNode.insertBefore(visual, el);
+      el.style.display = 'none';
+    } else {
+      el.readOnly = true;
+      el.setAttribute('style', LOCK_STYLE);
+    }
+  });
+
+  // Ocultar dropzone de adjuntos si no está en editables
+  if (!editableNames.includes('adjuntos')) {
+    const dz = modal.querySelector('.adjuntos-dropzone');
+    if (dz) dz.style.display = 'none';
+    // Ocultar botones eliminar adjunto
+    modal.querySelectorAll('.btn-adj-del').forEach(b => b.style.display = 'none');
+  }
+
+  // Ocultar controles de URL Anexos si no está en editables
+  if (!editableNames.includes('url_anexos')) {
+    modal.querySelectorAll('.upload-btn, .btn-clear-upload').forEach(b => b.style.display = 'none');
+  }
+}
+
+// Oculta el botón ✕ Eliminar del campo URL Anexos (para roles que no deben borrar)
+function hidePillDelete() {
+  const modal = $('modalBody');
+  if (modal) modal.querySelectorAll('.btn-pill-del').forEach(b => b.style.display = 'none');
+}
+const CARGADOR_CAMPOS_PETICION = [
+  'nombre_elabora', 'nombre_proyecta', 'nombre_revisa', 'nombre_aprueba', 'observaciones'
+];
+
+// Campos editables para rol "cargador" en modal De Oficio
+const CARGADOR_CAMPOS_OFICIO = [
+  'nombre_elabora', 'nombre_proyecta', 'nombre_revisa', 'nombre_aprueba', 'url_anexos', 'observaciones'
+];
+
+// Campos editables para rol "revisor" en modal Peticiones
+const REVISOR_CAMPOS_PETICION = ['nombre_revisa', 'estado_revision'];
+
+// Campos editables para rol "revisor" en modal De Oficio
+const REVISOR_CAMPOS_OFICIO = ['nombre_revisa', 'estado_revisado'];
+
+// Campos editables para rol "aprobador" en modal Peticiones
+const APROBADOR_CAMPOS_PETICION = ['nombre_aprueba', 'estado_aprovado'];
+
+// Campos editables para rol "aprobador" en modal De Oficio
+const APROBADOR_CAMPOS_OFICIO = ['nombre_aprueba', 'estado_aprobado'];
+
+// ══════════════════════════════════════════════════════════════
+// ADJUNTOS MÚLTIPLES
+// ══════════════════════════════════════════════════════════════
+
+
+function iconoAdjunto(nombre) {
+  const ext = (nombre||'').split('.').pop().toLowerCase();
+  if (['pdf'].includes(ext))                                  return '📄';
+  if (['zip','rar','7z','tar','gz'].includes(ext))            return '🗜️';
+  if (['jpg','jpeg','png','gif','webp','svg'].includes(ext))  return '🖼️';
+  if (['doc','docx'].includes(ext))                           return '📝';
+  if (['xls','xlsx'].includes(ext))                           return '📊';
+  return '📎';
+}
+
+function adjuntosFieldHtml(adjuntosActuales) {
+  const esAdmin = session && session.rol === 'administrador';
+  const items   = (adjuntosActuales || []).map((a, i) => `
+    <div class="adjunto-item" id="adj_item_${i}">
+      <span class="adjunto-icon">${iconoAdjunto(a.nombre)}</span>
+      <span class="adjunto-nombre"><a href="${esc(a.url)}" target="_blank">${esc(a.nombre)}</a></span>
+      ${esAdmin ? `<button type="button" class="btn-adj-del" onclick="eliminarAdjuntoUI(${i},'${esc(a.id)}')">✕</button>` : ''}
+    </div>`).join('');
+
+  return `
+    <div class="field g-full">
+      <label>Archivos adjuntos</label>
+      <div class="adjuntos-wrap" id="adjuntosWrap">
+        <input type="file" id="adjFileInput" multiple
+               accept=".pdf,.zip,.rar,.7z,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.tar,.gz"
+               style="display:none" onchange="handleAdjuntosUpload()"/>
+        <div class="adjuntos-list" id="adjuntosList">${items}</div>
+        <div class="adjuntos-dropzone" onclick="$('adjFileInput').click()">
+          <span style="font-size:20px">📎</span>
+          <span class="adjuntos-dropzone-text">
+            Arrastra archivos o <span>haz clic para seleccionar</span><br>
+            <small style="font-size:11px;color:#b0bec5;">PDF, imágenes, documentos, archivos comprimidos</small>
+          </span>
+          <button type="button" class="btn-adj-upload" onclick="event.stopPropagation();$('adjFileInput').click()">⬆ Subir</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+let _adjuntos = [];
+
+function initAdjuntos(existentes) {
+  _adjuntos = existentes ? JSON.parse(JSON.stringify(existentes)) : [];
+}
+
+async function handleAdjuntosUpload() {
+  const input = $('adjFileInput');
+  const lista = $('adjuntosList');
+  if (!input || !input.files.length) return;
+
+  const archivos = Array.from(input.files);
+  input.value = '';
+
+  for (const file of archivos) {
+    if (file.size > 20 * 1024 * 1024) {
+      showToast(`❌ "${file.name}" supera 20 MB`, 'err'); continue;
+    }
+    const loadId  = 'adj_loading_' + Date.now();
+    const loadDiv = document.createElement('div');
+    loadDiv.className = 'adjunto-uploading';
+    loadDiv.id        = loadId;
+    loadDiv.innerHTML = `<div class="upload-spinner"></div><span>Subiendo "${esc(file.name)}"…</span>`;
+    lista.appendChild(loadDiv);
+
+    try {
+      const base64 = await fileToBase64(file);
+      const result = await call('subirAdjunto', {
+        nombre: file.name, mimeType: file.type || 'application/octet-stream', data: base64
+      });
+      const ld = $(loadId); if(ld) ld.remove();
+
+      if (result.ok) {
+        const idx     = _adjuntos.length;
+        const esAdmin = session && session.rol === 'administrador';
+        _adjuntos.push({ nombre: result.nombre, url: result.url, id: result.id });
+        const item = document.createElement('div');
+        item.className = 'adjunto-item';
+        item.id        = `adj_item_${idx}`;
+        item.innerHTML = `
+          <span class="adjunto-icon">${iconoAdjunto(result.nombre)}</span>
+          <span class="adjunto-nombre"><a href="${esc(result.url)}" target="_blank">${esc(result.nombre)}</a></span>
+          ${esAdmin ? `<button type="button" class="btn-adj-del" onclick="eliminarAdjuntoUI(${idx},'${esc(result.id)}')">✕</button>` : ''}`;
+        lista.appendChild(item);
+        showToast(`✅ "${result.nombre}" adjuntado`);
+      } else {
+        showToast(`❌ Error subiendo "${file.name}": ${result.message}`, 'err');
+      }
+    } catch(e) {
+      const ld = $(loadId); if(ld) ld.remove();
+      showToast(`❌ Error: ${e.message}`, 'err');
+    }
+  }
+}
+
+async function eliminarAdjuntoUI(idx, fileId) {
+  if (session.rol !== 'administrador') return;
+  if (!confirm('¿Eliminar este archivo adjunto? Esta acción no se puede deshacer.')) return;
+  try {
+    const result = await call('eliminarAdjunto', fileId);
+    if (result.ok) {
+      _adjuntos.splice(idx, 1);
+      const lista   = $('adjuntosList');
+      const esAdmin = true;
+      lista.innerHTML = _adjuntos.map((a, i) => `
+        <div class="adjunto-item" id="adj_item_${i}">
+          <span class="adjunto-icon">${iconoAdjunto(a.nombre)}</span>
+          <span class="adjunto-nombre"><a href="${esc(a.url)}" target="_blank">${esc(a.nombre)}</a></span>
+          <button type="button" class="btn-adj-del" onclick="eliminarAdjuntoUI(${i},'${esc(a.id)}')">✕</button>
+        </div>`).join('');
+      showToast('Archivo eliminado');
+    } else {
+      showToast('❌ Error al eliminar: ' + result.message, 'err');
+    }
+  } catch(e) { showToast('❌ Error: ' + e.message, 'err'); }
+}
+
+function getAdjuntosJson() { return JSON.stringify(_adjuntos); }
+
+function confirmDel(cb){
+  $('confirmOverlay').classList.add('open');
+  $('confirmOkBtn').onclick=()=>{ closeConfirm(); cb(); };
+}
+function closeConfirm(){ $('confirmOverlay').classList.remove('open'); }
+
+// Cerrar modal solo con el botón X
 </script>
 </body>
 </html>
